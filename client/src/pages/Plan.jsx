@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Box, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { GradientButton } from "components/atoms";
-import { GradientAnimation } from "utils";
-import { Link, useNavigate } from "react-router-dom";
+import { GradientButton } from 'components/atoms';
+import { GradientAnimation } from 'utils';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { connect } from "react-redux";
+import { connect } from 'react-redux';
 import api from 'utils/api';
-
 
 const Title = styled(Typography)(({ theme }) => ({
   color: '#F0F0F0',
@@ -18,8 +17,8 @@ const Title = styled(Typography)(({ theme }) => ({
   textAlign: 'center',
   [theme.breakpoints.down('sm')]: {
     fontSize: '24px',
-    marginBottom: 40,
-  },
+    marginBottom: 40
+  }
 }));
 
 const Text = styled(Typography)(({ theme }) => ({
@@ -27,7 +26,7 @@ const Text = styled(Typography)(({ theme }) => ({
   fontSize: 14,
   [theme.breakpoints.down('sm')]: {
     textAlign: 'center'
-  },
+  }
 }));
 
 const CardItem = styled(Stack)(({ selected }) => ({
@@ -48,8 +47,8 @@ const CardItem = styled(Stack)(({ selected }) => ({
   '&:hover': {
     transform: 'scale(1.05)',
     '&:before': {
-      opacity: 1,
-    },
+      opacity: 1
+    }
   }
 }));
 
@@ -59,41 +58,42 @@ const CardContent = styled(Stack)({
   borderRadius: '0 0 12px 12px',
   backgroundColor: '#F0F0F0',
   alignItems: 'center'
-})
+});
 
 function Plan({ isAuthenticated }) {
   const [plan, setPlan] = useState(1);
-  const navigate = useNavigate()
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState('')
-
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
 
   const onPayment = async () => {
     if (!isAuthenticated) {
-      navigate('/signin')
+      navigate('/signin');
     } else {
-      api.post("/stripe/checkout").then(res => {
-        window.location.href = res.data.url;
-      }).catch(err => {
-        console.error(err)
-      })
+      api
+        .get('/stripe/plans')
+        .then((res) => {
+          api
+            .post('/stripe/checkout', { planId: res.data.pro })
+            .then((res) => {
+              window.location.href = res.data.url;
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
+  };
 
-  }
-
-  console.log('isauthenticated', isAuthenticated)
+  console.log('isauthenticated', isAuthenticated);
   return (
     <Box>
       <Title>Picsjam txt-to-img Offers</Title>
-      <Stack
-        mb={{ md: '80px', xs: '40px' }}
-        alignItems='center'
-      >
-        <Stack
-          direction={{ md: 'row', xs: 'column' }}
-          mb={10}
-          gap={3}
-        >
+      <Stack mb={{ md: '80px', xs: '40px' }} alignItems="center">
+        <Stack direction={{ md: 'row', xs: 'column' }} mb={10} gap={3}>
           <CardItem selected={plan === 1} onClick={() => setPlan(1)}>
             <Typography
               sx={{
@@ -109,7 +109,7 @@ function Plan({ isAuthenticated }) {
             <CardContent>
               <Typography
                 sx={{
-                  padding: '50px 0',
+                  padding: '50px 0'
                 }}
                 fontSize={36}
               >
@@ -138,7 +138,8 @@ function Plan({ isAuthenticated }) {
                   color: 'white',
                   borderRadius: '12px 12px 0 0',
                   fontWeight: 600,
-                  background: 'linear-gradient(94.08deg, #61CAFF 46.67%, #6651CE 71.01%, #FBB05B 92.84%)',
+                  background:
+                    'linear-gradient(94.08deg, #61CAFF 46.67%, #6651CE 71.01%, #FBB05B 92.84%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   width: 'fit-content !important',
@@ -146,13 +147,14 @@ function Plan({ isAuthenticated }) {
                 }}
                 fontSize={20}
               >
-                <span style={{ WebkitTextFillColor: 'white' }}>PicsJam</span> PRO+
+                <span style={{ WebkitTextFillColor: 'white' }}>PicsJam</span>{' '}
+                PRO+
               </Typography>
             </Box>
             <CardContent>
               <Typography
                 sx={{
-                  padding: '50px 0',
+                  padding: '50px 0'
                 }}
                 fontSize={36}
               >
@@ -182,7 +184,7 @@ function Plan({ isAuthenticated }) {
             <CardContent>
               <Typography
                 sx={{
-                  padding: '50px 0',
+                  padding: '50px 0'
                 }}
                 fontSize={36}
               >
@@ -200,20 +202,34 @@ function Plan({ isAuthenticated }) {
         </Stack>
         <GradientButton onClick={onPayment}>Continue to payment</GradientButton>
       </Stack>
-      <Stack mb='100px' gap={2}>
-        <Text>This is an AI Image Generator. It creates an image from scratch from a text description.</Text>
-        <Text>Yes, this is the one you've been waiting for. Text-to-image uses AI to understand your words and convert them to a unique image each time. Like magic.</Text>
-        <Text>This can be used to generate AI art, or for general silliness.</Text>
-        <Text>Don't expect the quality to be photorealistic, however. You would need a really really big AI to do that, and have you priced those lately?</Text>
-        <Text>If you can't think of something, try "Balloon in the shape of X" where X is something you wouldn't find in balloon form.</Text>
+      <Stack mb="100px" gap={2}>
+        <Text>
+          This is an AI Image Generator. It creates an image from scratch from a
+          text description.
+        </Text>
+        <Text>
+          Yes, this is the one you've been waiting for. Text-to-image uses AI to
+          understand your words and convert them to a unique image each time.
+          Like magic.
+        </Text>
+        <Text>
+          This can be used to generate AI art, or for general silliness.
+        </Text>
+        <Text>
+          Don't expect the quality to be photorealistic, however. You would need
+          a really really big AI to do that, and have you priced those lately?
+        </Text>
+        <Text>
+          If you can't think of something, try "Balloon in the shape of X" where
+          X is something you wouldn't find in balloon form.
+        </Text>
       </Stack>
     </Box>
   );
 }
 
 const mapStateToProps = (state) => ({
-  isAuthenticated: state.auth.isAuthenticated,
+  isAuthenticated: state.auth.isAuthenticated
 });
-
 
 export default connect(mapStateToProps)(Plan);

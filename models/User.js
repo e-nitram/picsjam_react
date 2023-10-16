@@ -18,9 +18,8 @@ const UserSchema = new mongoose.Schema({
     customerId: {
       type: String
     },
-    planType: {
-      type: String,
-      enum: ['', '', '']
+    planId: {
+      type: String
     }
   },
   avatar: {

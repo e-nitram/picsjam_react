@@ -53,11 +53,12 @@ router.post(
           .json({ errors: [{ msg: 'Invalid Credentials' }] });
       }
 
-
-      
       const payload = {
         user: {
-          id: user.id
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          subscription: user.subscription
         }
       };
 

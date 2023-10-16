@@ -16,12 +16,21 @@ const createStripeCustomerId = async (email) => {
   }
 };
 
+const retrieveStripeCustomer = async (customerId) => {
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    return customer;
+  } catch (err) {
+    throw new Error('Error on Customer retrieving');
+  }
+};
+
 /**
  * @param {*} successUrl
  * @param {*} customerId =>
  * @returns session url to implement stripe subscription
  */
-const createCheckoutSession = async (successUrl, customerId) => {
+const createCheckoutSession = async (successUrl, customerId, planId) => {
   const monthlySubscriptionPriceId = process.env.STRIPE_MONTHLY_SUBSCRIPTION_ID;
 
   const sessionInput = {
@@ -33,6 +42,9 @@ const createCheckoutSession = async (successUrl, customerId) => {
         quantity: 1
       }
     ],
+    metadata: {
+      planId: planId
+    },
     success_url: successUrl,
     cancel_url: 'https://example.com/cancel',
     customer: customerId, // ID of the Stripe customer
