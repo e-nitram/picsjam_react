@@ -14,6 +14,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  subscription: {
+    customerId: {
+      type: String
+    },
+    planType: {
+      type: String,
+      enum: ['', '', '']
+    }
+  },
   avatar: {
     type: String
   },
