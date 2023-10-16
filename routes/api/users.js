@@ -8,6 +8,7 @@ const { check, validationResult } = require('express-validator');
 const normalize = require('normalize-url');
 
 const User = require('../../models/User');
+const { createStripeCustomerId } = require('../../libs/stripe');
 
 // @route    POST api/users
 // @desc     Register user
@@ -27,7 +28,7 @@ router.post(
     }
 
     const { name, email, password } = req.body;
-    console.log('req', req.body)
+    console.log('req', req.body);
 
     try {
       let user = await User.findOne({ email });
@@ -47,11 +48,16 @@ router.post(
         { forceHttps: true }
       );
 
+      const stripeCustomerId = await createStripeCustomerId(email);
+
       user = new User({
         name,
         email,
         avatar,
-        password
+        password,
+        subscription: {
+          customerId: stripeCustomerId
+        }
       });
 
       const salt = await bcrypt.genSalt(10);
@@ -100,13 +106,13 @@ router.put(
 
     let user = await User.findById(req.params.id);
 
-    let isMatch = true
+    let isMatch = true;
 
-    let newData = { email, name }
+    let newData = { email, name };
 
-    if(password) {
+    if (password) {
       isMatch = await bcrypt.compare(currentPassword, user.password);
-  
+
       const salt = await bcrypt.genSalt(10);
 
       const newPassword = await bcrypt.hash(password, salt);
@@ -114,19 +120,20 @@ router.put(
       newData = {
         ...newData,
         password: newPassword
-      }
+      };
     }
 
     if (!isMatch) {
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'Password incorrect.' }] });
+      return res.status(400).json({ errors: [{ msg: 'Password incorrect.' }] });
     }
 
     try {
-      const result = await User.findOneAndUpdate({ _id: req.params.id }, newData);
+      const result = await User.findOneAndUpdate(
+        { _id: req.params.id },
+        newData
+      );
 
-      res.json({ msg: "success" });
+      res.json({ msg: 'success' });
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -137,18 +144,15 @@ router.put(
 // @route    Delete api/users/:id
 // @desc     Delete user
 // @access   Public
-router.delete(
-  '/:id',
-  async (req, res) => {
-    try {
-      await User.findOneAndRemove({_id: req.params.id});
+router.delete('/:id', async (req, res) => {
+  try {
+    await User.findOneAndRemove({ _id: req.params.id });
 
-      res.json({ msg: "success" });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
-    }
+    res.json({ msg: 'success' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
   }
-);
+});
 
 module.exports = router;
